@@ -18,6 +18,7 @@ package v2
 import (
 	"bytes"
 	"crypto/sha512"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -70,12 +71,13 @@ func TestWriteRead(t *testing.T) {
 		verify(t, f3)
 	})
 	t.Run("gob", func(t *testing.T) {
-		data, err := f.GobEncode()
+		var buffer bytes.Buffer
+		err := gob.NewEncoder(&buffer).Encode(f)
 		if err != nil {
 			t.Fatal(err)
 		}
 		var f2 Filter
-		err = f2.GobDecode(data)
+		err = gob.NewDecoder(&buffer).Decode(&f2)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -130,14 +132,16 @@ func TestCorruption(t *testing.T) {
 	})
 
 	t.Run("gob", func(t *testing.T) {
-		data, err := f.GobEncode()
+		var buffer bytes.Buffer
+		err := gob.NewEncoder(&buffer).Encode(f)
 		if err != nil {
 			t.Fatal(err)
 		}
+		data := buffer.Bytes()
 		// Flip a bit
 		data[len(data)/2] ^= 1
 		var f2 Filter
-		err = f2.GobDecode(data)
+		err = gob.NewDecoder(&buffer).Decode(&f2)
 		if err == nil {
 			t.Errorf("expected error")
 		}
