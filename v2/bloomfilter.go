@@ -77,16 +77,18 @@ func (f *Filter) AddHash(hash uint64) {
 func (f *Filter) ContainsHash(hash uint64) bool {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
-	var (
-		i uint64
-		r = uint64(1)
-	)
-	for n := 0; n < len(f.keys) && r != 0; n++ {
+
+	for n := 0; n < len(f.keys); n++ {
 		hash = ((hash << rotation) | (hash >> (64 - rotation))) ^ f.keys[n]
-		i = hash % f.m
-		r &= (f.bits[i>>6] >> uint(i&0x3f)) & 1
+		i := hash % f.m
+
+		b := f.bits[i>>6] & (1 << uint(i&0x3f))
+		if b == 0 {
+			// Any bit that does not exist is not non-existent
+			return false
+		}
 	}
-	return r != 0
+	return true
 }
 
 // Contains tests if f contains v
