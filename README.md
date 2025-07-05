@@ -25,7 +25,7 @@ $ go get github.com/holiman/bloomfilter
 
 ### WTF is a bloom filter
 
-**TL;DR:** Probabilistic, extra lookup table to track a set of elements kept elsewhere to reduce expensive, unnecessary set element retrieval and/or iterator operations **when an element is not present in the set.** It's a classic time-storage tradeoff algoritm.
+**TL;DR:** Probabilistic, extra lookup table to track a set of elements kept elsewhere to reduce expensive, unnecessary set element retrieval and/or iterator operations **when an element is not present in the set.** It's a classic time-storage tradeoff algorithm.
 
 ### Properties
 
